@@ -1,0 +1,1 @@
+# Simple extracting JSON content of an Outlook .msg file, intern small thing
