@@ -24,9 +24,6 @@ def setup_modules(used_modules):
     #print(f"Please re-run the program, some packages were installed")
     #sys.exit(1)
     if len(missing_modules) != 0:
-        print(sys.argv[0], sys.argv)
-        print()
-        print(count[0])
         os.execv(sys.executable, ['python'] + sys.argv)
     
 setup_modules(used_modules)
@@ -163,9 +160,9 @@ def OverallProgram():
     opts, argss = getopt.getopt(sys.argv[1:], "r:e:")
     for opt, val in opts:
         if opt == "-r":
-            raw_files_folder = val
+            raw_files_folder = val.strip(".\\").strip('"')
         elif opt == "-e":
-            extracted_raw_files_folder = val
+            extracted_raw_files_folder = val.strip(".\\").strip('"')
     if raw_files_folder == None:
         raw_files_folder = "Raw Data"
     if not os.path.exists(os.path.join(os.path.realpath("./"), raw_files_folder)):
