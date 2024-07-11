@@ -43,8 +43,6 @@ import re
 
 import getopt
 
-outlook = win32com.client.Dispatch("Outlook.Application").GetNamespace("MAPI")
-
 process_map_dict = {
 "(A)": "pension, provident fund or social security",
 "(B)": "equity share and stock options gains",
@@ -85,6 +83,9 @@ def extract_data_from_msg_file(msg_file_abs_path):
     body_portion = msg.Body
     json_start_index = body_portion.find("-- Start of JSON --") + len("-- Start of JSON --")
     json_end_index = body_portion.find("-- End of JSON --")
+    if json_start_index == 18 and json_end_index == -1:
+        del outlook, msg
+        return None
     JSON_portion = body_portion[json_start_index:json_end_index]
     #print(JSON_portion)
     parsed_json = json.loads(JSON_portion)
@@ -94,9 +95,6 @@ def extract_data_from_msg_file(msg_file_abs_path):
     for qns_ans_dict in parsed_json:
         if re.search(r"(\([A-Z]\)$)", qns_ans_dict["question"][-3:]):
             extracted_data[qns_ans_dict["question"][-3:]] = qns_ans_dict["answer"]
-        ## For old .msg formats, remove for future so no mismatch parts, accidentally wrong for future ones
-        elif re.search("Did you provide the following remuneration components to your employees in year 20.. (YA 20..)?", qns_ans_dict["question"]):
-            extracted_data["(C)"] = qns_ans_dict["answer"]
     sorted_extracted_data = dict(sorted(extracted_data.items(), key=lambda item:item[0][1]))
 
     del outlook, msg
@@ -150,6 +148,8 @@ def extract_from_folder_with_companies_folders(raw_files_folder = "Raw Data", ex
                 form_extracted_data_name = f"form_extracted_data_{count}.json"
                 print("Multiple Copies of Msg?!?!")
             extracted_data = extract_data_from_msg_file(msg_file_abs_path)
+            if extracted_data == None:
+                continue
             processed_extracted_data = process_extracted_data(extracted_data)
             #print(processed_extracted_data)
             #print()
