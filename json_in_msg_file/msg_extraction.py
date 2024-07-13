@@ -59,7 +59,7 @@ def process_qns(qns, ans, processed_dict):
         processed_dict["Structured Data List"].append(process_map_dict[qns])
         return
     if qns == "(C)":
-        processed_dict["Structured Data List"] += [option for option in (re.split(r"(, [a-z]\) )", ans[3:])) if option != "None of the above."]
+        processed_dict["Structured Data List"] += [option for option in (re.split(r", [a-z]\) ", ans[3:])) if option != "None of the above."]
         return
     if qns == "(D)" or qns == "(E)":
         if free_text_filter(ans):
