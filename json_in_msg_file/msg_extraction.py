@@ -56,7 +56,8 @@ def free_text_filter(free_text):
 
 def process_qns(qns, ans, processed_dict):
     if qns == "(A)" or qns == "(B)":
-        processed_dict["Structured Data List"].append(process_map_dict[qns])
+        if re.search("Yes", ans):
+            processed_dict["Structured Data List"].append(process_map_dict[qns])
         return
     if qns == "(C)":
         processed_dict["Structured Data List"] += [option for option in (re.split(r", [a-z]\) ", ans[3:])) if option != "None of the above."]
@@ -157,15 +158,25 @@ def extract_from_folder_with_companies_folders(raw_files_folder = "Raw Data", ex
 
 def OverallProgram():
     raw_files_folder = extracted_raw_files_folder = None
-    opts, argss = getopt.getopt(sys.argv[1:], "r:e:")
+    somewhat_original_arg = " ".join(sys.argv[1:])
+    new_arg_format = [string_c for string_c in re.split(r" ?(-[re]) ?", re.sub(r'\"', r"\\", somewhat_original_arg)) if string_c]
+    
+    #opts, argss = getopt.getopt(sys.argv[1:], "r:e:")
+    opts, argss = getopt.getopt(new_arg_format, "r:e:")
+    
+    #print(new_arg_format)
+    #print(opts)
+    
     for opt, val in opts:
         if opt == "-r":
             raw_files_folder = val.strip(".\\").strip('"')
         elif opt == "-e":
             extracted_raw_files_folder = val.strip(".\\").strip('"')
+    #print(raw_files_folder, extracted_raw_files_folder)
     if raw_files_folder == None:
         raw_files_folder = "Raw Data"
     if not os.path.exists(os.path.join(os.path.realpath("./"), raw_files_folder)):
+        print(f"The path '{os.path.join(os.path.realpath("./"), raw_files_folder)}' does not exists?!?!")
         print("Have a raw-companies-files-overall-folder named 'Raw Data'")
         print("OR")
         print("Usage: " + sys.argv[0] + " -r raw-companies-files-overall-folder -e extracted-companies-files-overall-folder")
