@@ -1789,7 +1789,7 @@ def OverallProgram():
         if opt == "-e":
             extracted_raw_files_folder = val.strip(".\\").strip('"')
     if not os.path.exists(os.path.join(os.path.realpath("./"), extracted_raw_files_folder)):
-        print(f"The path '{os.path.join(os.path.realpath("./"), extracted_raw_files_folder)}' does not exists?!?!")
+        print(f"The path '{os.path.join(os.path.realpath('./'), extracted_raw_files_folder)}' does not exists?!?!")
         print("Have a extracted-companies-files-overall-folder named 'Extracted Raw Data'")
         print("OR")
         print("Usage: " + sys.argv[0] + " -e extracted-companies-files-overall-folder")

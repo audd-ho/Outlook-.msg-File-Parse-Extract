@@ -176,7 +176,7 @@ def OverallProgram():
     if raw_files_folder == None:
         raw_files_folder = "Raw Data"
     if not os.path.exists(os.path.join(os.path.realpath("./"), raw_files_folder)):
-        print(f"The path '{os.path.join(os.path.realpath("./"), raw_files_folder)}' does not exists?!?!")
+        print(f"The path '{os.path.join(os.path.realpath('./'), raw_files_folder)}' does not exists?!?!")
         print("Have a raw-companies-files-overall-folder named 'Raw Data'")
         print("OR")
         print("Usage: " + sys.argv[0] + " -r raw-companies-files-overall-folder -e extracted-companies-files-overall-folder")
