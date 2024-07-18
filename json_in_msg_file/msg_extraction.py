@@ -109,8 +109,18 @@ def output_extracted_file(output_dir, output_file_name_with_type, extracted_data
         #output_file.write(str(extracted_data))
 
 def extract_from_folder_with_companies_folders(raw_files_folder = "Raw Data", extracted_raw_files_folder = None):
+    #print(os.path.join(os.path.realpath('./'), raw_files_folder))
+    #print(os.path.dirname(os.path.join(os.path.realpath('./'), raw_files_folder)))
+    #print(os.path.basename(os.path.join(os.path.realpath('./'), raw_files_folder)))
+    #print(os.path.join(os.path.dirname(os.path.join(os.path.realpath('./'), raw_files_folder)), ("Extracted " + os.path.basename(os.path.join(os.path.realpath('./'), raw_files_folder)))))
+    #print("Extracted " + os.path.basename(os.path.join(os.path.realpath('./'), raw_files_folder)))
+
+    raw_files_folder_dir = os.path.basename(os.path.join(os.path.realpath('./'), raw_files_folder))
+    
     if extracted_raw_files_folder == None:
-        extracted_raw_files_folder = ("Extracted "+ raw_files_folder)
+        extracted_raw_files_folder = re.sub("(.*)" + raw_files_folder_dir, r"\1Extracted "+raw_files_folder_dir, raw_files_folder)
+        #print(extracted_raw_files_folder)
+
     form_extracted_data_name = "form_extracted_data.json"
     ## not dictionary since no unique key to give/use
     extracted_data_list = []
