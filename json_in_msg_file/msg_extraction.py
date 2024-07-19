@@ -81,7 +81,6 @@ def get_parsed_json_raw_read(msg_file_abs_path):
     start_json_index = entire_msg_raw.find(start_json) + len(start_json)
     end_json_index = entire_msg_raw.find(end_json)
     if start_json_index == 39 and end_json_index == -1:
-        del outlook, msg
         return None
     JSON_portion_raw = entire_msg_raw[start_json_index:end_json_index]
     JSON_portion = re.sub("\x00", "", JSON_portion_raw)
