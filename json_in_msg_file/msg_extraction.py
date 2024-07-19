@@ -204,10 +204,11 @@ def OverallProgram():
     #print(opts)
     
     for opt, val in opts:
+        ## [\/\\]? is to account for windows vs linux/unix/etc, the directory separator difference
         if opt == "-r":
-            raw_files_folder = re.sub(r'"$', "", re.sub(r"^.\\", "", val))
+            raw_files_folder = re.sub(r'[\/\\]?"?$', "", re.sub(r"^.\\", "", val))
         elif opt == "-e":
-            extracted_raw_files_folder = re.sub(r'"$', "", re.sub(r"^.\\", "", val))
+            extracted_raw_files_folder = re.sub(r'[\/\\]?"?$', "", re.sub(r"^.\\", "", val))
     #print(raw_files_folder, extracted_raw_files_folder)
     if raw_files_folder == None:
         raw_files_folder = "Raw Data"
