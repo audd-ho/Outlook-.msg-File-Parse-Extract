@@ -108,10 +108,10 @@ def get_parsed_json_pywin32_module(msg_file_abs_path):
 def extract_data_from_msg_file(msg_file_abs_path):
     
     ## Using pywin32, win32com.client module essentially
-    #parsed_json = get_parsed_json_pywin32_module(msg_file_abs_path)
+    parsed_json = get_parsed_json_pywin32_module(msg_file_abs_path)
     
     ## Without the need of pywin32, win32com.client module, using just read file as raw data with like diff formatting and etc
-    parsed_json = get_parsed_json_raw_read(msg_file_abs_path)
+    #parsed_json = get_parsed_json_raw_read(msg_file_abs_path)
     
     if parsed_json == None:
         return None
