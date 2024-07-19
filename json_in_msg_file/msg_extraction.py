@@ -85,7 +85,7 @@ def get_parsed_json_raw_read(msg_file_abs_path):
         return None
     JSON_portion_raw = entire_msg_raw[start_json_index:end_json_index]
     JSON_portion = re.sub("\x00", "", JSON_portion_raw)
-    ## For old .msg formats, remove for future so no mismatch parts, accidentally wrong for future ones
+    ## For old messages(.msg) qns formats, naming etc, remove for future so no mismatch parts, accidentally wrong for future ones
     JSON_portion = re.sub(r'\x1a"', "", JSON_portion)
     parsed_json = json.loads(JSON_portion, strict=False)
     return parsed_json
