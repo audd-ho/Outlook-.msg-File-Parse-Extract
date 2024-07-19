@@ -1782,12 +1782,14 @@ def process_extracted_folder_freetext(extracted_raw_files_folder = "Extracted Ra
 ## but need pick model, else too time consuming unless can do on server?
 
 import getopt
+import re
 def OverallProgram():
     extracted_raw_files_folder = "Extracted Raw Data"
     opts, argss = getopt.getopt(sys.argv[1:], "e:") ## split by pair of 2s
     for opt, val in opts:
+        ## [\/\\]? is to account for windows vs linux/unix/etc, the directory separator difference
         if opt == "-e":
-            extracted_raw_files_folder = val.strip(".\\").strip('"')
+            extracted_raw_files_folder = re.sub(r'[\/\\]?"?$', "", re.sub(r"^.\\", "", val))
     if not os.path.exists(os.path.join(os.path.realpath("./"), extracted_raw_files_folder)):
         print(f"The path '{os.path.join(os.path.realpath('./'), extracted_raw_files_folder)}' does not exists?!?!")
         print("Have a extracted-companies-files-overall-folder named 'Extracted Raw Data'")
