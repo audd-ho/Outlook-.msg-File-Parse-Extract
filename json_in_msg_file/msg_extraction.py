@@ -206,9 +206,9 @@ def OverallProgram():
     
     for opt, val in opts:
         if opt == "-r":
-            raw_files_folder = val.strip(".\\").strip('"')
+            raw_files_folder = re.sub(r'"$', "", re.sub(r"^.\\", "", val))
         elif opt == "-e":
-            extracted_raw_files_folder = val.strip(".\\").strip('"')
+            extracted_raw_files_folder = re.sub(r'"$', "", re.sub(r"^.\\", "", val))
     #print(raw_files_folder, extracted_raw_files_folder)
     if raw_files_folder == None:
         raw_files_folder = "Raw Data"
