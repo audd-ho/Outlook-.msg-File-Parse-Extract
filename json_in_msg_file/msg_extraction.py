@@ -73,7 +73,23 @@ def process_qns(qns, ans, processed_dict):
 
 def get_msg_files(some_list_of_files_name):
     return [file_name for file_name in some_list_of_files_name if file_name[-4:]==".msg"]
-def extract_data_from_msg_file(msg_file_abs_path):
+def get_parsed_json_raw_read(msg_file_abs_path):
+    with open(msg_file_abs_path, "r", encoding="utf-8", errors="ignore") as msg_file:
+        entire_msg_raw = msg_file.read()
+    start_json = '\x00-\x00-\x00 \x00S\x00t\x00a\x00r\x00t\x00 \x00o\x00f\x00 \x00J\x00S\x00O\x00N\x00 \x00-\x00-\x00\n'
+    end_json = '\x00-\x00-\x00 \x00E\x00n\x00d\x00 \x00o\x00f\x00 \x00J\x00S\x00O\x00N\x00 \x00-\x00-\x00\n'
+    start_json_index = entire_msg_raw.find(start_json) + len(start_json)
+    end_json_index = entire_msg_raw.find(end_json)
+    if start_json_index == 39 and end_json_index == -1:
+        del outlook, msg
+        return None
+    JSON_portion_raw = entire_msg_raw[start_json_index:end_json_index]
+    JSON_portion = re.sub("\x00", "", JSON_portion_raw)
+    ## For old .msg formats, remove for future so no mismatch parts, accidentally wrong for future ones
+    JSON_portion = re.sub(r'\x1a"', "", JSON_portion)
+    parsed_json = json.loads(JSON_portion, strict=False)
+    return parsed_json
+def get_parsed_json_pywin32_module(msg_file_abs_path):
     outlook = win32com.client.Dispatch("Outlook.Application").GetNamespace("MAPI")
     msg = outlook.OpenSharedItem(msg_file_abs_path)
 
@@ -87,6 +103,18 @@ def extract_data_from_msg_file(msg_file_abs_path):
     JSON_portion = body_portion[json_start_index:json_end_index]
     #print(JSON_portion)
     parsed_json = json.loads(JSON_portion)
+    del outlook, msg
+    return parsed_json
+def extract_data_from_msg_file(msg_file_abs_path):
+    
+    ## Using pywin32, win32com.client module essentially
+    #parsed_json = get_parsed_json_pywin32_module(msg_file_abs_path)
+    
+    ## Without the need of pywin32, win32com.client module, using just read file as raw data with like diff formatting and etc
+    parsed_json = get_parsed_json_raw_read(msg_file_abs_path)
+    
+    if parsed_json == None:
+        return None
     #print(type(parsed_json))
     
     extracted_data = {}
