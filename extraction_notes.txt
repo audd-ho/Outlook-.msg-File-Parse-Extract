@@ -3,7 +3,7 @@
 
 If using "get_parsed_json_raw_read" without a module to help parse, there will be the below section
 
-## For old .msg formats, remove for future so no mismatch parts, accidentally wrong for future ones
+## For old messages(.msg) qns formats, naming etc, remove for future so no mismatch parts, accidentally wrong for future ones
 JSON_portion = re.sub(r'\x1a"', "", JSON_portion)
 
 It is used for cleaning special characters like ticks icon/characters etc! since they will affect the json.loads parsing when it gets parsed into utf-8 as " and affect the key/value delimiters since cut certain strings short with early " or maybe ' or etc for other special characters
