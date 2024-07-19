@@ -123,7 +123,6 @@ def extract_data_from_msg_file(msg_file_abs_path):
             extracted_data[qns_ans_dict["question"][-3:]] = qns_ans_dict["answer"]
     sorted_extracted_data = dict(sorted(extracted_data.items(), key=lambda item:item[0][1]))
 
-    del outlook, msg
     return sorted_extracted_data
 def process_extracted_data(extracted_data):
     processed_dict = {"Structured Data List":[], "Free Text":[], "Free Text, not in payroll":[]}
