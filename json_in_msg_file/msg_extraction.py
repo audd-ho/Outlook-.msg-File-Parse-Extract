@@ -3,7 +3,7 @@ import sys
 import subprocess
 import importlib
 
-used_modules = ["win32com.client", "json", "copy", "re", "getopt"]
+used_modules = ["win32com.client", "json", "copy", "re", "getopt", "extract_msg"]
 
 def install(package):
     subprocess.check_call([sys.executable, "-m", "pip", "install", package])
@@ -19,6 +19,8 @@ def setup_modules(used_modules):
     for mod in missing_modules:
         if mod == "win32com.client":
             install("pywin32")
+        elif mod == "extract_msg":
+            install("extract-msg")
         else:
             install(mod)
     #print(f"Please re-run the program, some packages were installed")
@@ -29,6 +31,7 @@ def setup_modules(used_modules):
 setup_modules(used_modules)
 
 import win32com.client
+import extract_msg
 import os
 import json
 #import xlwt
@@ -67,8 +70,14 @@ def process_qns(qns, ans, processed_dict):
             processed_dict["Free Text"].append(ans)
         return
     if qns == "(F)":
+        processed_dict["Renumeration Outside"] = "y" if ans[0] == "a" else "n"
+        return
+    if qns == "(G)":
         if free_text_filter(ans):
             processed_dict["Free Text, not in payroll"].append(ans)
+        return
+    if qns == "(Z)":
+        processed_dict["Duly Reported"] = ans[0]
         return
 
 def get_msg_files(some_list_of_files_name):
@@ -86,7 +95,19 @@ def get_parsed_json_raw_read(msg_file_abs_path):
     JSON_portion = re.sub("\x00", "", JSON_portion_raw)
     ## For old messages(.msg) qns formats, naming etc, remove for future so no mismatch parts, accidentally wrong for future ones
     JSON_portion = re.sub(r'\x1a"', "", JSON_portion)
+    ##
     parsed_json = json.loads(JSON_portion, strict=False)
+    return parsed_json
+def get_parsed_json_extract_msg(msg_file_abs_path):
+    msg = extract_msg.Message(msg_file_abs_path)
+
+    body_portion = msg.body
+    json_start_index = body_portion.find("-- Start of JSON --") + len("-- Start of JSON --")
+    json_end_index = body_portion.find("-- End of JSON --")
+    if json_start_index == 18 and json_end_index == -1:
+        return None
+    JSON_portion = body_portion[json_start_index:json_end_index]
+    parsed_json = json.loads(JSON_portion)
     return parsed_json
 def get_parsed_json_pywin32_module(msg_file_abs_path):
     outlook = win32com.client.Dispatch("Outlook.Application").GetNamespace("MAPI")
@@ -107,7 +128,10 @@ def get_parsed_json_pywin32_module(msg_file_abs_path):
 def extract_data_from_msg_file(msg_file_abs_path):
     
     ## Using pywin32, win32com.client module essentially
-    parsed_json = get_parsed_json_pywin32_module(msg_file_abs_path)
+    #parsed_json = get_parsed_json_pywin32_module(msg_file_abs_path)
+   
+    ## Using extract-msg, extract_msg module essentially
+    parsed_json = get_parsed_json_extract_msg(msg_file_abs_path)
     
     ## Without the need of pywin32, win32com.client module, using just read file as raw data with like diff formatting and etc
     #parsed_json = get_parsed_json_raw_read(msg_file_abs_path)
@@ -124,7 +148,7 @@ def extract_data_from_msg_file(msg_file_abs_path):
 
     return sorted_extracted_data
 def process_extracted_data(extracted_data):
-    processed_dict = {"Structured Data List":[], "Free Text":[], "Free Text, not in payroll":[]}
+    processed_dict = {"Structured Data List":[], "Free Text":[], "Renumeration Outside":None, "Free Text, not in payroll":[], "Duly Reported":None}
     for qns, ans in extracted_data.items():
         process_qns(qns, ans, processed_dict)
     return processed_dict
